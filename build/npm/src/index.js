@@ -6,11 +6,16 @@ const install = require("./install"),
     path = require("path"),
     unzip = require('unzipper'),
     https = require('https'),
+    ProxyAgent = require('proxy-agent'),
     packageJsonPath = path.join(__dirname, "..", "package.json"),
     binPath = "./bin";
 
-var downloadFollowingRedirect = function(url, resolve, reject) {
-    https.get(url, { headers: { 'accept-encoding': 'gzip,deflate' } }, res => {
+const downloadFollowingRedirect = function(url, resolve, reject) {
+    const opts = {
+        headers: { 'accept-encoding': 'gzip,deflate' },
+        agent: new ProxyAgent(),
+    }
+    https.get(url, opts, res => {
         if (res.statusCode >= 300 && res.statusCode < 400) {
             downloadFollowingRedirect(res.headers.location, reject, resolve);
         } else if (res.statusCode > 400) {
@@ -21,9 +26,9 @@ var downloadFollowingRedirect = function(url, resolve, reject) {
     });
 };
 
-var downloadAndExtract = function(version) {
+const downloadAndExtract = function(version) {
     console.log(`Fetching download url for Gauge version ${version}`);
-    let url = install.getBinaryUrl(version);
+    const url = install.getBinaryUrl(version);
     console.log(`Downloading ${url} to ${binPath}`);
     return new Promise((resolve, reject) => {
         try {

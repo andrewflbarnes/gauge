@@ -29,6 +29,7 @@
     "sinon": "^6.2.0"
   },
   "dependencies": {
+    "proxy-agent": "^5.0.0",
     "unzipper": "^0.9.3"
   }
 }
